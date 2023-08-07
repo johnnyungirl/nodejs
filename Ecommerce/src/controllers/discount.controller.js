@@ -9,10 +9,29 @@ class DiscountController{
             metadata: await DiscountService.CreateDiscount({...req.body,shopId:req.user.userId})
         }).send(res)
     }
-    getAllProductsByDiscountCode=async(req,res,next)=>{
+    getAllDiscountCodes=async (req,res,next)=>{
         new SuccessResponse({
-            message:"get list products by discount code success",
-            metadata:await DiscountService.GetAllProductsByDiscountCode(r)
+            message:'Successful Code Found',
+            metadata:await DiscountService.GetAllDiscountCodeByShop({
+                ...req.query,
+                shopId:req,user,userId
+            })
+        }).send(res)
+    }
+    getDiscountAmount=async (req,res,next)=>{
+        new SuccessResponse({
+            message:'Successful Code Found',
+            metadata:await DiscountService.GetDiscountAmount({
+                ...req.body,
+            })
+        }).send(res)
+    }
+    GetAllDiscountCodeWithProducts=async (req,res,next)=>{
+        new SuccessResponse({
+            message:'Successful Code Found',
+            metadata:await DiscountService.GetAllDiscountCodeByShop({
+                ...req.query,
+            })
         }).send(res)
     }
 }
