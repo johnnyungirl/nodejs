@@ -58,7 +58,7 @@ class ProductController{
     }
     getProducts=async(req,res,next)=>{
         new SuccessResponse({
-            message:"get products Success",
+            message:"get products success",
             metadata:await ProductService.findProducts({
                 product_id:req.params.product_id
             })

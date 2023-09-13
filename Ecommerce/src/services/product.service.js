@@ -48,9 +48,7 @@ class ProductFactory{
         })
     }
     static async findProducts({product_id}){
-        return await findProducts({product_id,
-            unSelect:['__v']
-        })
+        return await findProducts({product_id,unSelect:['__v']})
     }
     // END QUERY //
 }

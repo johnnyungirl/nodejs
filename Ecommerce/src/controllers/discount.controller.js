@@ -9,28 +9,51 @@ class DiscountController{
             metadata: await DiscountService.CreateDiscount({...req.body,shopId:req.user.userId})
         }).send(res)
     }
-    getAllDiscountCodes=async (req,res,next)=>{
+    getAllDiscountCode=async (req,res,next)=>{
         new SuccessResponse({
-            message:'Successful Code Found',
-            metadata:await DiscountService.GetAllDiscountCodeByShop({
-                ...req.query,
-                shopId:req,user,userId
+            message:'list discount code success',
+            metadata:await DiscountService.GetDiscountCodeByShop({
+                shopId:req.user.userId
             })
         }).send(res)
     }
     getDiscountAmount=async (req,res,next)=>{
         new SuccessResponse({
-            message:'Successful Code Found',
+            message:'get discount amount success',
             metadata:await DiscountService.GetDiscountAmount({
                 ...req.body,
+                shopId:req.body.shopId,
+                codeId:req.body.codeId
             })
         }).send(res)
     }
-    GetAllDiscountCodeWithProducts=async (req,res,next)=>{
+   
+    getProductsByDiscountCode=async(req,res,next)=>{
         new SuccessResponse({
-            message:'Successful Code Found',
-            metadata:await DiscountService.GetAllDiscountCodeByShop({
-                ...req.query,
+            message:"get products success",
+            metadata:await DiscountService.GetProductByDiscountCode({
+                shopId:req.body.shopId,
+                code:req.body.discount_code
+            })
+        }).send(res)
+            
+    }
+    cancelDiscountCode=async(req,res,next)=>{
+        new SuccessResponse({
+            message:"get products success",
+            metadata:await DiscountService.CancelDiscountCodeByCustomer({
+                codeId:req.body.discount_code,
+                shopId:req.user.userId,
+                userId:req.body.userId
+            })
+        }).send(res)
+    }
+    deleteDiscountCodeByShop=async(req,res,next)=>{
+        new SuccessResponse({
+            message:"delete discount code success",
+            metadata:await DiscountService.DeleteDiscountByShop({
+                codeId:req.body.discount_code,
+                shopId:req.user.userId
             })
         }).send(res)
     }

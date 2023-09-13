@@ -12,7 +12,7 @@ const apiKey=async(req,res,next)=>{
         if(!key){
             return res.status(403).json({
                 message:'Forbiden Error'
-            })
+            })``
         }
         //check objkey
         const objKey=await findbyID(key)

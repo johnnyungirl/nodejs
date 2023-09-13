@@ -3,7 +3,7 @@
 const { default: mongoose } = require("mongoose")
 const { BadRequestError } = require("../../core/error.response")
 const { product } = require("../product.model")
-const { getSelectData, unGetSelectData } = require("../../utils")
+const { getSelectData, unGetSelectData, convertToObjectIdMongodb } = require("../../utils")
 
 const findAllDraftsForShop=async ({query,limit,skip})=>{
     return await product.find(query)
@@ -74,7 +74,10 @@ const findProducts=async({product_id,unSelect})=>{
 }
 const updateProductById=async ({product_id,updatebody,model,isNew=true})=>{
         return await model.findByIdAndUpdate(product_id,updatebody,{new:isNew})
-}   
+}
+const getProductById=async(productId)=>{
+    return await product.findOne({_id:convertToObjectIdMongodb(productId)}).lean()
+}
 
 module.exports={
     findAllDraftsForShop,
@@ -84,5 +87,6 @@ module.exports={
     searchProductByUser,
     findAllProducts,
     findProducts,
-    updateProductById
+    updateProductById,
+    getProductById
 }

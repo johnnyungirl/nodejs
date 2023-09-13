@@ -1,43 +1,101 @@
+const { NotFoundError } = require("../core/error.response")
 const { cart } = require("../models/cart.model")
+const { getProductById } = require("../models/repositories/product.repo")
+
 
 class CartService{
-    static async createUserCart({userId,product}){
-        const query={cart_userId:userId,cart_state:'active'},
-        updateOrInsert={
+    static async createUserCart({userId,products}){
+        const query={cart_userId:userId,cart_states:'active'}
+        const update={
             $addToSet:{
-                cart_products:product
+                cart_product:products
             }
-        },options={upsert:true,new:true}
-        
-        return await cart.findOneAndUpdate(query,updateOrInsert,options)
+        }
+        const options ={upsert:true,new:true}
+        return await cart.findOneAndUpdate(query,update,options)
     }
-
-    static async updateUserCartQuantity({userId,product}){
-        const {productId,quantity}=product
+    static async UpdateCartItemQuantity({userId,products}){
+        const {productId,quantity}=products
         const query={
             cart_userId:userId,
-            'cart.products.productId':productId,
-            cart_state:'active'
-        }, updateSet={
+            'cart_product.productId':productId,
+            cart_states:'active'
+        }
+        const update={
             $inc:{
-                'cart_products.$.quantity':quantity
+                'cart_product.$.quantity':quantity
             }
-        }, options={upsert:true,new:true}
-        
-        return await cart.findOneAndUpdate(query,updateSet,options)
+        }
+        const options={
+            upsert:true,new:true
+        }
+        return await cart.findOneAndUpdate(query,update,options)
     }
-    static async addToCart({userId,product={}}){
-        const userCart=await cart.findOne({
-            cart_userId:userId
+    static async addToCart({userId,products={}}){
+        const foundCart=await cart.findOne({cart_userId:userId})
+        if(!foundCart){
+            return await CartService.createUserCart({userId,products})
+        }
+        if(!foundCart.cart_product.length){
+            foundCart.cart_product=[products]
+            return await foundCart.save()
+        }
+        return CartService.UpdateCartItemQuantity({userId,products})
+
+    }
+    /*
+        shop_order_ids:[
+            {
+                shopId,
+                item_products:[
+                    {
+                        quantity,
+                        price,
+                        shopId,
+                        old_quantity,
+                        productId
+                    }
+                ],
+                version
+            }
+        ]
+
+     */
+    static async addToCartV2({userId,shop_order_ids}){
+        const {productId,quantity,old_quantity}=shop_order_ids[0]?.item_products[0]
+        const foundProduct=await getProductById(productId)
+        if(!foundProduct) throw new NotFoundError('')
+        if(foundProduct.product_shop.toString()!==shop_order_ids[0]?.shopId){
+            throw new NotFoundError('Product do not belong to shop ')
+        }
+        if (quantity===0){
+            CartService.deleteItemUserCart({userId,productId})
+        }
+        return await CartService.UpdateCartItemQuantity({
+            userId,
+            products:{
+                productId,
+                quantity:quantity-old_quantity
+            }
         })
-        if (!userCart){
-            return await CartService.createUserCart({userId,product})
+    }
+    static async deleteItemUserCart({userId,productId}){
+        const query={cart_userId:userId,cart_states:'active'}
+        const update={
+            $pull:{
+                cart_product:{
+                    productId
+                }
+            }
         }
-        if(!userCart.cart_products.length){
-            userCart.cart_product[product]
-            return await userCart.save()
-        }
-        return await CartService.updateUserCartQuantity({userId,product})
+        const deleteCart=await cart.updateOne(query,update)
+        return deleteCart
+
+    }
+    static async getListUserCart({userId}){
+        return await cart.findOne({
+            cart_userId:+userId
+        }).lean()
     }
 }
 module.exports=CartService
