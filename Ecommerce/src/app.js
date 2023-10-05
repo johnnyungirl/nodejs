@@ -13,7 +13,10 @@ app.use(helmet())
 app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-
+//test pub/sub redis
+// require('./test/inventory.test')
+// const productTest=require('./test/product.test')
+// productTest.purchaseProduct('product:001',10)
 // const {checkOutload}=require('./helpers/check.connect')
 // checkOutload()
 // console.log(`Process::`,process.env)

@@ -139,8 +139,7 @@ class DiscountService{
                 discount_shopId:convertToObjectIdMongodb(shopId)
             }
         })
-        console.log(convertToObjectIdMongodb(shopId))
-        console.log(codeId)
+       
         if(!foundDiscount) throw new NotFoundError("Discount not exists")
         const {
             discount_is_active,
@@ -172,20 +171,21 @@ class DiscountService{
                 throw new NotFoundError(`discount requires a minium value of ${discount_min_value_order} `)
             }
             // if(discount_max_uses_per_user>0){
-            //     const userUserDiscount=discount_uses_used.find(user=>user.userId===userId)
-            //     if(userUserDiscount){
-            //         //.......
-            //     }
-            // }
+                //     const userUserDiscount=discount_uses_used.find(user=>user.userId===userId)
+                //     if(userUserDiscount){
+                    //         //.......
+                    //     }
+                    // }
+                    
         }
         let totalOrderwithDiscount=totalOrder
         if(discount_applies_to==='specific'){
             for(let i=0;i<products.length;i++){
-                if(!discount_product_ids.includes(products[i].productId)){
+                if(!discount_product_ids.includes((products[i].productId).toString())){
                     totalOrderwithDiscount=totalOrderwithDiscount-(products[i].quantity*products[i].price)
-                    console.log(products[i].productId)
                 }
             }
+
         }
 
         let amount

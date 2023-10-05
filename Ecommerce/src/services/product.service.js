@@ -44,7 +44,7 @@ class ProductFactory{
     }
     static async findAllProducts({sort='c-time',limit=50,page=1,skip=0,filter={isPublished:true}}){
         return await findAllProducts({sort,limit,page,skip,filter,
-            select:['product_name','product_price','product_thumb']
+            select:['product_shop','product_name','product_price','product_thumb']
         })
     }
     static async findProducts({product_id}){

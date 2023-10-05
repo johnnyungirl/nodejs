@@ -97,7 +97,7 @@ class AccessService{
                     type:'pkcs1',
                     format:'pem'
                 },
-                privateKeyEncoding:{
+                privateKeyEncoding:{    
                     type:'pkcs1',
                     format:'pem'
                 }

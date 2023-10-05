@@ -1,6 +1,7 @@
 const { NotFoundError } = require("../core/error.response")
 const { cart } = require("../models/cart.model")
 const { getProductById } = require("../models/repositories/product.repo")
+const { getSelectData } = require("../utils")
 
 
 class CartService{
@@ -31,14 +32,19 @@ class CartService{
         }
         return await cart.findOneAndUpdate(query,update,options)
     }
-    static async addToCart({userId,products={}}){
+    static async addToCart({userId,products}){
         const foundCart=await cart.findOne({cart_userId:userId})
         if(!foundCart){
+            
             return await CartService.createUserCart({userId,products})
         }
-        if(!foundCart.cart_product.length){
-            foundCart.cart_product=[products]
+        const {cart_product}=foundCart
+        if(!cart_product.length){
+            cart_product=[products]
             return await foundCart.save()
+        }
+        if(!cart_product.some(obj=>obj.productId===products.productId)){
+            return await cart.findOneAndUpdate({cart_userId:userId},{$addToSet:{cart_product:products}},{upsert:true,new:true})
         }
         return CartService.UpdateCartItemQuantity({userId,products})
 
@@ -95,7 +101,7 @@ class CartService{
     static async getListUserCart({userId}){
         return await cart.findOne({
             cart_userId:+userId
-        }).lean()
+        }).select(getSelectData(['cart_product']))
     }
 }
 module.exports=CartService
